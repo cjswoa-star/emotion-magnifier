@@ -9,7 +9,7 @@ h1{font-size:27px;letter-spacing:-1px;margin:0 0 10px}.desc{font-size:14px;color
 </style></head><body>
 <div class="landing" id="landing"><div class="card"><div class="symbol">◌</div><h1>감정 확대경</h1><p class="desc">내 마음도 찾아보고, 감정 퀴즈에도 도전해 보세요.<br>워크숍 참여용 시범 화면입니다.</p>
 <label class="field" for="code">참여코드</label><input class="input" id="code" placeholder="6자리 코드" maxlength="6" inputmode="numeric" autocomplete="off">
-<label class="field" for="nick">닉네임</label><input class="input" id="nick" maxlength="12" placeholder="예: 마음탐험가" autocomplete="off"><p class="hint">실제 이름 대신 별명을 입력해 주세요.</p>
+<label class="field" for="nick">닉네임</label><input class="input" id="nick" maxlength="12" placeholder="예: 마음탐험가" autocomplete="off"><p class="hint">실제 이름 대신 별명을 입력해 주세요. 퀴즈 점수는 교사 현황판 순위에 표시됩니다.</p>
 <button class="primary" id="join">참여하기</button><p class="msg" id="msg"></p></div></div>
 <div class="hidden" id="studentView"><div class="top"><strong>감정확대경</strong><span id="who">활동 중</span><button id="leave">나가기</button></div><div class="appwrap"><iframe id="v3" title="감정확대경 V3" src="about:blank"></iframe></div></div>
 <script type="module">
@@ -39,7 +39,7 @@ function startInspect(){let tries=0;const timer=setInterval(()=>{tries++;try{con
 function attach(doc,dev){if(frameAttached)return;frameAttached=true;const app=doc.getElementById("app");let scheduled=false;const inspect=()=>{scheduled=false;saveQuiz(dev)};
 observer=new MutationObserver(()=>{if(!scheduled){scheduled=true;setTimeout(inspect,130)}});observer.observe(app,{childList:true,subtree:true,attributes:true,attributeFilter:["class","style"]});
 doc.addEventListener("click",e=>{if(e.target.closest("#moodFinish")){captureMood(doc)}setTimeout(inspect,140)},true);inspect();}
-async function write(path,value){try{await set(ref(db,root+code+"/participants/"+pid+"/"+path),value)}catch(e){console.warn("결과 저장 실패",path,e);$("who").textContent="저장 오류 · 다시 확인"}}
+async function write(path,value){try{await set(ref(db,root+code+"/participants/"+pid+"/"+path),value)}catch(e){console.warn("결과 저장 실패",path,e);$("who").textContent="저장 오류 · 다시 확인";throw e}}
 function newAttempt(questionSignature){
  attemptSignature=questionSignature;
  attemptId="a"+crypto.randomUUID().replace(/-/g,"");
@@ -47,7 +47,7 @@ function newAttempt(questionSignature){
 }
 function saveQuiz(dev){
  const state=dev?.state,q=state?.quiz;
- if(!q||!q.area||!q.questions?.length||!pid)return;
+ if(!q||!q.area||!q.questions?.length||!pid||!["QUIZ_PLAY","QUIZ_RESULT"].includes(state.mode))return;
  const signature=q.area+"|"+q.questions.map(x=>x.id).join(",");
  if(signature!==attemptSignature)newAttempt(signature);
  const answers={};
