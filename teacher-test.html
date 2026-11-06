@@ -10,6 +10,8 @@ h1{font-size:25px;letter-spacing:-1.2px;margin:0}h2{letter-spacing:-.5px}.sub{co
 .session{display:grid;grid-template-columns:minmax(0,1fr) 174px;gap:20px;border:1px solid #e2dfff;background:linear-gradient(110deg,#fff,#eeebff);border-radius:29px;padding:27px 30px;box-shadow:0 12px 30px #4b46720d}
 .eyebrow{color:#7867d7;font-weight:800;letter-spacing:.08em;font-size:12px}.code{font-size:clamp(38px,5vw,64px);font-weight:850;letter-spacing:.13em;line-height:1.15;margin:10px 0 8px;font-variant-numeric:tabular-nums}.helper{font-size:13px;color:#626b85;line-height:1.65}
 .actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}.btn{border:0;border-radius:12px;background:var(--purple);color:#fff;font-weight:750;padding:12px 18px;box-shadow:0 4px 0 #5546ba22}.btn:disabled{opacity:.5;cursor:default}.btn.alt{background:#fff;color:#564bc4;border:1px solid #dcd8f5;box-shadow:none}.qrbox{background:#fff;border:1px solid #e8e8ef;border-radius:20px;padding:12px;min-height:174px;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;gap:8px}.qrbox img{height:133px;width:133px;object-fit:contain}.qrbox small{color:#707a90;font-size:10px}.qrplaceholder{color:#817ea1;font-size:12px;line-height:1.6}
+.qr-preview{display:grid;place-items:center;padding:0;border:0;border-radius:10px;background:#fff}.qr-preview:disabled{cursor:default}.qr-preview:not(:disabled):hover{outline:3px solid #d8d1ff}.qr-preview:focus-visible{outline:3px solid var(--purple);outline-offset:4px}
+.qr-present{display:flex;align-items:center;flex-direction:column;text-align:center;gap:12px}.qr-present img{display:block;width:min(52dvh,70vw,560px);max-width:100%;height:auto;aspect-ratio:1;background:#fff;border-radius:12px}.qr-present .code{font-size:clamp(40px,6vw,80px);margin:0;letter-spacing:.14em}.qr-present p{margin:0;color:var(--muted);font-size:clamp(14px,1.7vw,20px)}.qr-present .url{max-width:100%;margin:0}
 .url{margin-top:12px;word-break:break-all;color:#5f57b2;font-size:12px;text-decoration:underline}
 .sectionhead{display:flex;justify-content:space-between;align-items:end;gap:10px;margin:32px 0 16px}.sectionhead h2{font-size:22px;margin:0}.sectionhead p{margin:3px 0 0;color:var(--muted);font-size:13px}
 .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:19px}.panel{aspect-ratio:1 / 1;min-height:490px;display:flex;flex-direction:column;padding:29px;border:1px solid #e7e8f3;border-radius:32px;background:#fff;box-shadow:0 12px 26px #3333550b;overflow:hidden}.panel.quiz{background:linear-gradient(150deg,#fff,#f5f2ff)}.panel.mood{background:linear-gradient(160deg,#fff,#f4faff)}
@@ -82,9 +84,9 @@ body.detail-open{overflow:hidden}
 <section class="session" aria-label="참여 방법"><div>
 <div class="eyebrow">WORKSHOP · 참여코드</div><div class="code" id="sessionCode">—— ——</div>
 <div class="helper">학생은 참여코드 또는 QR로 입장합니다.<br>닉네임을 사용하며, 감정 지도 결과는 전체 통계로만 표시합니다.</div>
-<div class="actions"><button class="btn" id="createBtn">새 참여방 만들기</button><button class="btn alt" id="demoBtn">화면 예시 보기</button><button class="btn alt" id="copyBtn" disabled>참여 주소 복사</button></div>
+<div class="actions"><button class="btn" id="createBtn">새 참여방 만들기</button><button class="btn alt" id="demoBtn">화면 예시 보기</button><button class="btn alt" id="copyBtn" disabled>참여 주소 복사</button><button class="btn alt" id="qrZoomBtn" type="button" aria-haspopup="dialog" aria-controls="detailOverlay" disabled>⛶ QR 크게 보기</button></div>
 <a id="joinLink" class="url hidden" target="_blank" rel="noopener"></a><div class="notice" id="message">현재 기존 감정확대경 V3는 변경하지 않았습니다. 시험용 참여방을 만들 수 있습니다.</div>
-</div><div class="qrbox"><img class="hidden" id="qrImage" alt="참여용 QR 코드"><div id="qrPlaceholder" class="qrplaceholder">새 참여방을 만들면<br>QR 코드가 나타납니다.</div><small id="qrCaption">참여 주소 · 시험용</small></div></section>
+</div><div class="qrbox"><button class="qr-preview" id="qrPreviewBtn" type="button" aria-label="참여용 QR 코드 크게 보기" aria-haspopup="dialog" aria-controls="detailOverlay" disabled><img class="hidden" id="qrImage" alt="참여용 QR 코드"></button><div id="qrPlaceholder" class="qrplaceholder">새 참여방을 만들면<br>QR 코드가 나타납니다.</div><small id="qrCaption">참여 주소 · 시험용</small></div></section>
 <div class="sectionhead"><div><h2>오늘의 활동 현황</h2><p>퀴즈의 이해도와 감정 지도의 분포를 한눈에 확인합니다.</p></div><span class="pill" id="total">참여 0명</span></div>
 <div class="grid">
 <section class="panel quiz expandable" id="quizPanel" role="button" tabindex="0" aria-label="감정 퀴즈 순위 전체화면 보기">
@@ -109,6 +111,15 @@ body.detail-open{overflow:hidden}
       <p class="detail-desc" id="detailDesc">참여자의 퀴즈 점수를 순위별로 확인합니다.</p></div>
       <button class="detail-close" id="detailClose" type="button" aria-label="전체화면 닫기">✕ 닫기 (ESC)</button>
     </div>
+    <section class="detail-content" id="detailQR" aria-label="참여용 QR 코드 확대" hidden>
+      <div class="qr-present">
+        <img id="largeQRImage" alt="학생 참여용 확대 QR 코드">
+        <p>카메라로 QR 코드를 스캔하거나 참여코드를 입력하세요.</p>
+        <div class="code" id="largeQRCode"></div>
+        <a class="url" id="largeQRLink" target="_blank" rel="noopener"></a>
+        <p id="largeQRError" hidden>QR 이미지를 불러오지 못했습니다. 위 주소와 참여코드를 이용해 주세요.</p>
+      </div>
+    </section>
     <section class="detail-content" id="detailQuiz" aria-label="퀴즈 순위">
       <div class="detail-quiz-layout">
         <div class="detail-stats">
@@ -169,7 +180,7 @@ const esc=s=>String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&
 const rand=()=>String(100000+(crypto.getRandomValues(new Uint32Array(1))[0]%900000));
 function say(s){$("message").textContent=s}
 function qr(code){const url=joinBase+"?code="+encodeURIComponent(code);$("joinLink").href=url;$("joinLink").textContent=url;$("joinLink").classList.remove("hidden");$("copyBtn").disabled=false;
-$("qrImage").src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=2&data="+encodeURIComponent(url);$("qrImage").classList.remove("hidden");$("qrPlaceholder").classList.add("hidden");}
+$("qrImage").src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=2&data="+encodeURIComponent(url);$("qrImage").classList.remove("hidden");$("qrPlaceholder").classList.add("hidden");$("qrZoomBtn").disabled=false;$("qrPreviewBtn").disabled=false;$("qrCaption").textContent="QR을 누르면 크게 볼 수 있어요";if(expandedMode==="qr")drawQRExpanded();}
 async function showRoom(code){
  currentCode=code;demo=false;$("sessionCode").textContent=code;$("connection").textContent="실시간 연결 중";qr(code);
  history.replaceState(null,"","?code="+encodeURIComponent(code));
@@ -191,7 +202,7 @@ async function showRoom(code){
 $("createBtn").addEventListener("click",async()=>{if(!db)return say("Firebase에 연결할 수 없습니다.");$("createBtn").disabled=true;say("새 참여방 생성 확인 중…");try{const user=await authReady;let created;for(let i=0;i<8;i++){const code=rand();const r=await runTransaction(ref(db,root+code),v=>v===null?{meta:{createdAt:Date.now(),status:"open",ownerUid:user.uid}}:undefined,{applyLocally:false});if(r.committed){created=code;break}}if(!created)throw Error("참여코드 생성 실패");showRoom(created);}catch(e){say("참여방 생성 실패: "+e.message);$("connection").textContent="연결 확인 필요";}finally{$("createBtn").disabled=false}});
 $("copyBtn").addEventListener("click",()=>navigator.clipboard.writeText($("joinLink").href).then(()=>say("참여 주소를 복사했습니다.")).catch(()=>say("주소 복사가 차단되었습니다. 주소를 직접 복사해 주세요.")));
 const fakeAreas=["highUncomfortable","highComfortable","lowUncomfortable","lowComfortable"];
-$("demoBtn").addEventListener("click",()=>{if(stop){stop();stop=null}demo=true;currentCode="";history.replaceState(null,"",location.pathname+"?demo=1");$("sessionCode").textContent="482731";$("connection").textContent="예시 데이터";$("qrImage").classList.add("hidden");$("qrPlaceholder").classList.remove("hidden");$("joinLink").classList.add("hidden");$("copyBtn").disabled=true;say("화면 디자인 확인용 예시입니다. QR 및 숫자 코드는 실제 입장에 사용되지 않습니다.");const test=Array.from({length:24},(_,i)=>({nickname:"참여자"+(i+1),mood:i<20?{area:fakeAreas[i%4],x:Math.min(.98,(i%4%2?.5:0)+.08+(i*13%36)/100),y:Math.min(.98,(i%4<2?0:.5)+.09+(i*7%35)/100),word:"감정"}:null,quizAreas:i<17?{highComfortable:{score:(5+i%6)*10,answeredCount:10,completedAt:Date.now(),answers:{}}}:null}));draw(test,test.map(p=>p.mood).filter(Boolean))});
+$("demoBtn").addEventListener("click",()=>{if(expandedMode==="qr")closeExpanded();$("qrZoomBtn").disabled=true;$("qrPreviewBtn").disabled=true;$("qrCaption").textContent="참여 주소 · 시험용";if(stop){stop();stop=null}demo=true;currentCode="";history.replaceState(null,"",location.pathname+"?demo=1");$("sessionCode").textContent="482731";$("connection").textContent="예시 데이터";$("qrImage").classList.add("hidden");$("qrPlaceholder").classList.remove("hidden");$("joinLink").classList.add("hidden");$("copyBtn").disabled=true;say("화면 디자인 확인용 예시입니다. QR 및 숫자 코드는 실제 입장에 사용되지 않습니다.");const test=Array.from({length:24},(_,i)=>({nickname:"참여자"+(i+1),mood:i<20?{area:fakeAreas[i%4],x:Math.min(.98,(i%4%2?.5:0)+.08+(i*13%36)/100),y:Math.min(.98,(i%4<2?0:.5)+.09+(i*7%35)/100),word:"감정"}:null,quizAreas:i<17?{highComfortable:{score:(5+i%6)*10,answeredCount:10,completedAt:Date.now(),answers:{}}}:null}));draw(test,test.map(p=>p.mood).filter(Boolean))});
 function draw(list,moodsInput=[]){lastData={list,moods:moodsInput};$("total").textContent="참여 "+list.length+"명";const done=list.filter(p=>Object.values(p.quizAreas||{}).some(q=>q.completedAt));const scores=done.flatMap(p=>Object.values(p.quizAreas||{}).filter(q=>q.completedAt).map(q=>q.score||0));const average=scores.length?Math.round(scores.reduce((a,b)=>a+b,0)/scores.length):null;
 $("quizDone").textContent=done.length+"명";$("quizRate").textContent=average===null?"—":average+"%";$("quizProgressLabel").textContent=done.length+" / "+list.length+"명";$("quizProgress").style.width=(list.length?100*done.length/list.length:0)+"%";
 const active=list.filter(p=>Object.values(p.quizAreas||{}).some(q=>q.answeredCount>0)&&!Object.values(p.quizAreas||{}).some(q=>q.completedAt)).length;
@@ -245,8 +256,21 @@ function drawMoodExpanded(){
   }
  }
 }
+function drawQRExpanded(){
+ const url=joinBase+"?code="+encodeURIComponent(currentCode);
+ $("largeQRCode").textContent=currentCode;
+ $("largeQRLink").href=url;$("largeQRLink").textContent=url;
+ const image=$("largeQRImage"),src="https://api.qrserver.com/v1/create-qr-code/?size=1024x1024&margin=12&data="+encodeURIComponent(url);
+ if(image.getAttribute("src")!==src){$("largeQRError").hidden=true;image.src=src;}
+}
+$("largeQRImage").addEventListener("error",()=>{$("largeQRError").hidden=false});
+$("largeQRImage").addEventListener("load",()=>{$("largeQRError").hidden=true});
+for(const id of ["qrZoomBtn","qrPreviewBtn"]){
+ const button=$(id);button.addEventListener("click",()=>openExpanded("qr",button));
+}
 function refreshExpanded(){
  if(!expandedMode)return;
+ if(expandedMode==="qr"){drawQRExpanded();return;}
  if(expandedMode==="quiz"){
   const done=lastData.list.filter(p=>Object.values(p.quizAreas||{}).some(q=>q?.completedAt));
   const scores=lastData.list.flatMap(p=>Object.values(p.quizAreas||{}).filter(q=>q?.completedAt&&Number.isFinite(Number(q.score))).map(q=>Number(q.score)));
@@ -256,11 +280,12 @@ function refreshExpanded(){
  }else{drawMoodExpanded()}
 }
 function openExpanded(mode,from){
+ if(mode==="qr"&&(!currentCode||demo))return;
  openedFrom=from;expandedMode=mode;rankReveal=0;
- const isQuiz=mode==="quiz",ov=$("detailOverlay");
- $("detailTitle").textContent=isQuiz?"감정 퀴즈 전체 순위":"우리의 감정 지도";
- $("detailDesc").textContent=isQuiz?"닉네임별 점수를 한 명씩 공개할 수 있습니다.":"서로 다른 감정의 위치를 한눈에 살펴봅니다.";
- $("detailQuiz").hidden=!isQuiz;$("detailMood").hidden=isQuiz;
+ const isQuiz=mode==="quiz",isQR=mode==="qr",ov=$("detailOverlay");
+ $("detailTitle").textContent=isQR?"QR로 함께 참여해요":isQuiz?"감정 퀴즈 전체 순위":"우리의 감정 지도";
+ $("detailDesc").textContent=isQR?"휴대전화 카메라로 QR 코드를 비추면 학생 참여 화면이 열립니다.":isQuiz?"닉네임별 점수를 한 명씩 공개할 수 있습니다.":"서로 다른 감정의 위치를 한눈에 살펴봅니다.";
+ $("detailQR").hidden=!isQR;$("detailQuiz").hidden=!isQuiz;$("detailMood").hidden=mode!=="mood";
  ov.hidden=false;document.body.classList.add("detail-open");
  refreshExpanded();$("detailClose").focus();
  if(ov.requestFullscreen){const request=ov.requestFullscreen();if(request?.catch)request.catch(()=>{});}
@@ -280,7 +305,14 @@ $("detailClose").addEventListener("click",closeExpanded);
 $("rankReset").addEventListener("click",()=>{rankReveal=0;drawRanking()});
 $("rankNext").addEventListener("click",()=>{rankReveal++;drawRanking()});
 $("rankAll").addEventListener("click",()=>{rankReveal=leaderboard(lastData.list).length;drawRanking()});
-document.addEventListener("keydown",e=>{if(e.key==="Escape"&&expandedMode)closeExpanded()});
+document.addEventListener("keydown",e=>{
+ if(e.key==="Escape"&&expandedMode)closeExpanded();
+ if(e.key==="Tab"&&expandedMode==="qr"){
+  const first=$("detailClose"),last=$("largeQRLink");
+  if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}
+  else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}
+ }
+});
 document.addEventListener("fullscreenchange",()=>{if(!document.fullscreenElement&&expandedMode)closeExpanded()});
 
 const urlCode=new URLSearchParams(location.search).get("code");if(urlCode&&/^\d{6}$/.test(urlCode)&&db)showRoom(urlCode);else if(new URLSearchParams(location.search).has("demo"))$("demoBtn").click();else draw([]);
