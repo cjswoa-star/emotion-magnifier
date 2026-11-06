@@ -14,27 +14,90 @@ h1{font-size:27px;letter-spacing:-1px;margin:0 0 10px}.desc{font-size:14px;color
 <div class="hidden" id="studentView"><div class="top"><strong>감정확대경</strong><span id="who">활동 중</span><button id="leave">나가기</button></div><div class="appwrap"><iframe id="v3" title="감정확대경 V3" src="about:blank"></iframe></div></div>
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
-import {getDatabase,ref,get,set,update} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-database.js";
+import {getDatabase,ref,get,set,update,runTransaction} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-database.js";
+import {getAuth,signInAnonymously} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
 const config={apiKey:"AIzaSyB6mWBT6IYc9BkGBPvPhIb0HBDA0Vj3Bxo",authDomain:"emotion-share-test.firebaseapp.com",databaseURL:"https://emotion-share-test-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"emotion-share-test",storageBucket:"emotion-share-test.firebasestorage.app",messagingSenderId:"9314731156",appId:"1:9314731156:web:528c2ff5274f3c4cbee081"};
-const $=x=>document.getElementById(x),root="emotionMagnifierTest/sessions/";let db,code="",pid="",moodid="",lastQuiz="",lastMood="",completedMoodSignature="",observer=null,frameAttached=false;
-try{db=getDatabase(initializeApp(config));}catch(e){$("msg").textContent="접속 설정 오류: "+e.message;}
+const $=x=>document.getElementById(x),root="emotionMagnifierTest/sessions/";let db,auth,code="",pid="",lastMood="",observer=null,frameAttached=false;
+let attemptSignature="",attemptId="",lastProgress="",lastResult="",savingResult=false;
+try{const app=initializeApp(config);db=getDatabase(app);auth=getAuth(app);}catch(e){$("msg").textContent="접속 설정 오류: "+e.message;}
 const qs=new URLSearchParams(location.search);$("code").value=qs.get("code")||"";
 $("join").addEventListener("click",async()=>{code=$("code").value.trim();const nickname=$("nick").value.trim().slice(0,12);if(!/^\d{6}$/.test(code)){return $("msg").textContent="참여코드 6자리를 입력해 주세요."}if(!nickname)return $("msg").textContent="닉네임을 입력해 주세요.";if(!db)return $("msg").textContent="Firebase 연결에 실패했습니다.";
 $("join").disabled=true;$("msg").textContent="참여방 확인 중…";
-try{const snap=await get(ref(db,root+code+"/meta"));if(!snap.exists()||snap.val().status!=="open")throw Error("참여할 수 있는 방이 아닙니다.");const key="EMOTION_MAGNIFIER_TEST_PID_"+code;pid=localStorage.getItem(key)||("p"+crypto.randomUUID().replace(/-/g,"").slice(0,18));localStorage.setItem(key,pid);const mk="EMOTION_MAGNIFIER_TEST_ANONMOOD_"+code;moodid=localStorage.getItem(mk)||("m"+crypto.randomUUID().replace(/-/g,"").slice(0,18));localStorage.setItem(mk,moodid);const existing=await get(ref(db,root+code+"/participants/"+pid));await update(ref(db,root+code+"/participants/"+pid),{nickname,joinedAt:existing.exists()?existing.val().joinedAt||Date.now():Date.now(),updatedAt:Date.now()});
+try{
+ const credential=await signInAnonymously(auth);
+ pid=credential.user.uid;
+ const snap=await get(ref(db,root+code+"/meta"));
+ if(!snap.exists()||snap.val().status!=="open")throw Error("참여할 수 있는 방이 아닙니다.");
+ const existing=await get(ref(db,root+code+"/participants/"+pid));
+ await update(ref(db,root+code+"/participants/"+pid),{
+  nickname,joinedAt:existing.exists()?existing.val().joinedAt||Date.now():Date.now(),updatedAt:Date.now()
+ });
 $("landing").classList.add("hidden");$("studentView").classList.remove("hidden");document.body.classList.add("joined");$("who").textContent=nickname+" · "+code;$("v3").src="index-v3.html";$("v3").addEventListener("load",startInspect,{once:true});}
 catch(e){$("msg").textContent="참여 실패: "+e.message;}finally{$("join").disabled=false}});
 $("leave").addEventListener("click",()=>{location.reload()});
 function startInspect(){let tries=0;const timer=setInterval(()=>{tries++;try{const outer=$("v3").contentDocument,inner=outer?.getElementById("appFrame")?.contentWindow,doc=inner?.document,dev=inner?.__EMOTION_LENS_DEV__;if(doc&&dev&&doc.getElementById("app")){clearInterval(timer);attach(doc,dev);return}}catch(e){console.warn("iframe 검사 중",e)}if(tries>100){clearInterval(timer);console.warn("감정확대경 연결 시간을 초과했습니다.")}},250)}
-function attach(doc,dev){if(frameAttached)return;frameAttached=true;const app=doc.getElementById("app");let scheduled=false;const inspect=()=>{scheduled=false;saveQuiz(dev);saveMood(doc)};
+function attach(doc,dev){if(frameAttached)return;frameAttached=true;const app=doc.getElementById("app");let scheduled=false;const inspect=()=>{scheduled=false;saveQuiz(dev)};
 observer=new MutationObserver(()=>{if(!scheduled){scheduled=true;setTimeout(inspect,130)}});observer.observe(app,{childList:true,subtree:true,attributes:true,attributeFilter:["class","style"]});
-doc.addEventListener("click",e=>{if(e.target.closest("#moodFinish")){captureMood(doc,true)}setTimeout(inspect,140)},true);inspect();}
+doc.addEventListener("click",e=>{if(e.target.closest("#moodFinish")){captureMood(doc)}setTimeout(inspect,140)},true);inspect();}
 async function write(path,value){try{await set(ref(db,root+code+"/participants/"+pid+"/"+path),value)}catch(e){console.warn("결과 저장 실패",path,e);$("who").textContent="저장 오류 · 다시 확인"}}
-function saveQuiz(dev){const state=dev.state;if(!state||!state.quiz||!state.quiz.area||!state.quiz.questions?.length)return;
-const q=state.quiz;const answers={};q.questions.forEach((item,i)=>{const a=q.answers[i];if(a)answers[item.id]={questionId:item.id,prompt:item.prompt,selected:a.selected,correct:!!a.correct,answer:item.answer,choices:item.choices}});
-const data={score:q.score||0,answeredCount:Object.keys(answers).length,completedAt:state.mode==="QUIZ_RESULT"?Date.now():null,updatedAt:Date.now(),answers};
-const hash=JSON.stringify([q.area,q.questions.map(x=>x.id),data.score,data.answeredCount,!!data.completedAt]);if(hash===lastQuiz)return;lastQuiz=hash;write("quizAreas/"+q.area,data);}
-function readMood(doc,finished){const marker=doc.querySelector("#meterMarker"),title=doc.querySelector(".meter-result h2");if(!marker||!title||marker.style.display==="none")return null;const x=parseFloat(marker.style.left)/100,y=parseFloat(marker.style.top)/100;if(!Number.isFinite(x)||!Number.isFinite(y))return null;const area=(y<.5?"high":"low")+(x<.5?"Uncomfortable":"Comfortable");return{area,x,y,word:title.textContent.trim(),completedAt:finished?Date.now():null,updatedAt:Date.now()}}
-function captureMood(doc,finished){const data=readMood(doc,finished);if(!data)return;const hash=JSON.stringify([data.area,data.x,data.y,data.word,!!data.completedAt]);const selection=JSON.stringify([data.area,data.x,data.y,data.word]);if(!finished&&selection===completedMoodSignature)return;if(finished)completedMoodSignature=selection;if(hash===lastMood)return;lastMood=hash;set(ref(db,root+code+"/moods/"+moodid),data).catch(e=>console.warn("익명 감정 저장 실패",e))}
-function saveMood(doc){captureMood(doc,false)}
+function newAttempt(questionSignature){
+ attemptSignature=questionSignature;
+ attemptId="a"+crypto.randomUUID().replace(/-/g,"");
+ lastProgress="";lastResult="";savingResult=false;
+}
+function saveQuiz(dev){
+ const state=dev?.state,q=state?.quiz;
+ if(!q||!q.area||!q.questions?.length||!pid)return;
+ const signature=q.area+"|"+q.questions.map(x=>x.id).join(",");
+ if(signature!==attemptSignature)newAttempt(signature);
+ const answers={};
+ q.questions.forEach((item,i)=>{const a=q.answers[i];if(a)answers[item.id]={
+   questionId:item.id,prompt:item.prompt,selected:a.selected,correct:!!a.correct,answer:item.answer,choices:item.choices
+ }});
+ const answeredCount=Object.keys(answers).length;
+ const progressHash=signature+"|"+answeredCount+"|"+state.mode;
+ if(progressHash!==lastProgress){
+  lastProgress=progressHash;
+  write("quizProgress/"+q.area,{
+   answeredCount,questionCount:q.questions.length,
+   status:state.mode==="QUIZ_RESULT"?"completed":"in_progress",updatedAt:Date.now()
+  }).catch(()=>{lastProgress="";});
+ }
+ if(state.mode!=="QUIZ_RESULT"||savingResult||lastResult===attemptId)return;
+ const score=Math.max(0,Math.min(100,Number(q.score)||0));
+ const finished={score,answeredCount,completedAt:Date.now(),attemptId,answers};
+ savingResult=true;
+ (async()=>{
+  // 모든 문항별 정답과 선택지를 저장하고, 최고 점수는 별도 보존
+  await set(ref(db,root+code+"/participants/"+pid+"/quizAttempts/"+attemptId),{area:q.area,...finished});
+  await runTransaction(ref(db,root+code+"/participants/"+pid+"/quizAreas/"+q.area),prev=>{
+   if(prev&&Number(prev.score)>=score)return prev;
+   return finished;
+  },{applyLocally:false});
+  lastResult=attemptId;
+  $("who").textContent="퀴즈 결과 저장됨 · "+code;
+ })().catch(e=>{
+  console.warn("퀴즈 결과 저장 실패",e);
+  $("who").textContent="퀴즈 저장 실패 · 재접속 확인";
+ }).finally(()=>{savingResult=false});
+}
+function readMood(doc){
+ const marker=doc.querySelector("#meterMarker"),title=doc.querySelector(".meter-result h2");
+ if(!marker||!title||marker.style.display==="none")return null;
+ const x=parseFloat(marker.style.left)/100,y=parseFloat(marker.style.top)/100;
+ if(!Number.isFinite(x)||!Number.isFinite(y))return null;
+ const area=(y<.5?"high":"low")+(x<.5?"Uncomfortable":"Comfortable");
+ return{area,x,y,word:title.textContent.trim(),completedAt:Date.now(),updatedAt:Date.now()};
+}
+function captureMood(doc){
+ const data=readMood(doc);
+ if(!data||!pid)return;
+ const hash=JSON.stringify([data.area,data.x,data.y,data.word]);
+ if(hash===lastMood)return;
+ // 선택 중에는 전송하지 않고, 참여자가 "확인했어요"를 누를 때만 전송
+ set(ref(db,root+code+"/moods/"+pid),data).then(()=>{
+  lastMood=hash;
+  $("who").textContent="감정 지도 저장됨 · "+code;
+ }).catch(e=>{console.warn("감정 선택 저장 실패",e);$("who").textContent="감정 저장 실패 · 재선택 필요"});
+}
 </script></body></html>
