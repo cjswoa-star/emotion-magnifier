@@ -1,0 +1,72 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "sessions": {
+      "$sessionId": {
+        ".read": "auth != null && (data.child('meta').child('ownerUid').val() === auth.uid || data.child('members').child(auth.uid).val() === true)",
+        "meta": {
+          ".read": "auth != null",
+          ".write": "auth != null && ((!data.exists() && newData.child('ownerUid').val() === auth.uid) || (data.exists() && data.child('ownerUid').val() === auth.uid && newData.child('ownerUid').val() === auth.uid))",
+          ".validate": "newData.hasChildren(['ownerUid','createdAt','status','phase']) && newData.child('ownerUid').isString() && newData.child('ownerUid').val().length > 10 && newData.child('status').isString() && (newData.child('status').val() === 'active' || newData.child('status').val() === 'closed') && newData.child('phase').isString()"
+        },
+        "members": {
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && root.child('sessions').child($sessionId).child('meta').child('status').val() === 'active'",
+            ".validate": "newData.val() === true"
+          }
+        },
+        "participants": {
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && root.child('sessions').child($sessionId).child('meta').child('status').val() === 'active'",
+            ".validate": "newData.hasChildren(['nickname']) && newData.child('nickname').isString() && newData.child('nickname').val().length > 0 && newData.child('nickname').val().length <= 20"
+          }
+        },
+        "groups": {
+          ".write": "auth != null && root.child('sessions').child($sessionId).child('meta').child('ownerUid').val() === auth.uid"
+        }
+      }
+    },
+    "emotionMagnifierTest": {
+      "sessions": {
+        "$code": {
+          ".read": "auth != null && (!data.exists() || data.child('meta').child('ownerUid').val() === auth.uid)",
+          ".write": "auth != null && ((!data.exists() && newData.child('meta').child('ownerUid').val() === auth.uid) || (data.exists() && data.child('meta').child('ownerUid').val() === auth.uid))",
+          "meta": {
+            ".read": "auth != null",
+            ".validate": "newData.hasChildren(['ownerUid','createdAt','status']) && newData.child('ownerUid').isString() && newData.child('ownerUid').val().length > 10 && newData.child('createdAt').isNumber() && newData.child('status').isString() && (newData.child('status').val() === 'open' || newData.child('status').val() === 'closed')"
+          },
+          "participants": {
+            "$uid": {
+              ".read": "auth != null && auth.uid === $uid",
+              ".write": "auth != null && auth.uid === $uid && root.child('emotionMagnifierTest').child('sessions').child($code).child('meta').child('status').val() === 'open'",
+              ".validate": "newData.hasChildren(['nickname','joinedAt']) && newData.child('nickname').isString() && newData.child('nickname').val().length > 0 && newData.child('nickname').val().length <= 12 && newData.child('joinedAt').isNumber()",
+              "quizProgress": {
+                "$area": {
+                  ".validate": "newData.hasChildren(['answeredCount','questionCount','status']) && newData.child('answeredCount').isNumber() && newData.child('answeredCount').val() >= 0 && newData.child('answeredCount').val() <= 10 && newData.child('questionCount').isNumber() && newData.child('questionCount').val() === 10 && newData.child('status').isString()"
+                }
+              },
+              "quizAreas": {
+                "$area": {
+                  ".validate": "newData.hasChildren(['score','answeredCount','completedAt']) && newData.child('score').isNumber() && newData.child('score').val() >= 0 && newData.child('score').val() <= 100 && newData.child('answeredCount').isNumber() && newData.child('answeredCount').val() === 10 && newData.child('completedAt').isNumber()"
+                }
+              },
+              "quizAttempts": {
+                "$attemptId": {
+                  ".validate": "newData.hasChildren(['area','score','answeredCount','completedAt']) && newData.child('area').isString() && newData.child('score').isNumber() && newData.child('score').val() >= 0 && newData.child('score').val() <= 100 && newData.child('answeredCount').isNumber() && newData.child('answeredCount').val() === 10 && newData.child('completedAt').isNumber()"
+                }
+              }
+            }
+          },
+          "moods": {
+            "$uid": {
+              ".read": "auth != null && auth.uid === $uid",
+              ".write": "auth != null && auth.uid === $uid && root.child('emotionMagnifierTest').child('sessions').child($code).child('meta').child('status').val() === 'open'",
+              ".validate": "newData.hasChildren(['area','x','y','word','completedAt']) && newData.child('area').isString() && (newData.child('area').val() === 'highUncomfortable' || newData.child('area').val() === 'highComfortable' || newData.child('area').val() === 'lowUncomfortable' || newData.child('area').val() === 'lowComfortable') && newData.child('x').isNumber() && newData.child('x').val() >= 0 && newData.child('x').val() <= 1 && newData.child('y').isNumber() && newData.child('y').val() >= 0 && newData.child('y').val() <= 1 && newData.child('word').isString() && newData.child('word').val().length <= 30 && newData.child('completedAt').isNumber()"
+            }
+          }
+        }
+      }
+    }
+  }
+}
