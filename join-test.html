@@ -63,9 +63,15 @@ observer=new MutationObserver(()=>{if(!scheduled){scheduled=true;setTimeout(insp
 doc.addEventListener("click",e=>{if(version===activityVersion&&e.target.closest("#moodFinish")){captureMood(doc,version)}setTimeout(inspect,140)},true);inspect();}
 async function changeParticipant(mutator,version=activityVersion){
  if(version!==activityVersion)return false;
- const result=await runTransaction(ref(db,root+code+"/participants/"+pid),data=>{
-  if(version!==activityVersion||!data||(Number(data.activityVersion)||0)!==version)return;
-  return mutator(data);
+ const participantRef=ref(db,root+code+"/participants/"+pid);
+ const snapshot=await get(participantRef),initial=snapshot.val();
+ if(!initial||version!==activityVersion||(Number(initial.activityVersion)||0)!==version)return false;
+ const result=await runTransaction(participantRef,data=>{
+  // A transaction can initially receive null when its path has no active listener.
+  // Use the fetched record as a proposal; the server retries against its current value.
+  const current=data||JSON.parse(JSON.stringify(initial));
+  if(version!==activityVersion||(Number(current.activityVersion)||0)!==version)return;
+  return mutator(current);
  },{applyLocally:false});
  return result.committed&&version===activityVersion;
 }
