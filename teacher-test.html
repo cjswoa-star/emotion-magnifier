@@ -97,7 +97,7 @@ body.detail-open{overflow:hidden}
 </section>
 <section class="panel mood expandable" id="moodPanel" role="button" tabindex="0" aria-label="감정 지도 전체화면 보기">
 <div class="paneltop"><div class="paneltag">MOOD MAP</div><span class="expand-cue">⛶ 크게 보기</span></div><h3>감정 지도 현황</h3><p class="hint">선택한 위치를 익명 점으로 함께 보기</p>
-<div class="moodmap" id="moodMap"><div class="q red" data-area="highUncomfortable"><b>빨강</b><small id="redN">0명</small><div class="dots"></div></div><div class="q yellow" data-area="highComfortable"><b>노랑</b><small id="yellowN">0명</small><div class="dots"></div></div><div class="q blue" data-area="lowUncomfortable"><b>파랑</b><small id="blueN">0명</small><div class="dots"></div></div><div class="q green" data-area="lowComfortable"><b>초록</b><small id="greenN">0명</small><div class="dots"></div></div></div>
+<div class="moodmap" id="moodMap"><div class="q red" data-area="highUncomfortable"><b>불편함<br>에너지 높음</b><small id="redN">0명</small><div class="dots"></div></div><div class="q yellow" data-area="highComfortable"><b>편안함<br>에너지 높음</b><small id="yellowN">0명</small><div class="dots"></div></div><div class="q blue" data-area="lowUncomfortable"><b>불편함<br>에너지 낮음</b><small id="blueN">0명</small><div class="dots"></div></div><div class="q green" data-area="lowComfortable"><b>편안함<br>에너지 낮음</b><small id="greenN">0명</small><div class="dots"></div></div></div>
 <div class="bottom"><div class="status" id="moodDetail">감정 위치 선택 0명 · 참여자의 이름과 감정 위치를 연결해 공개하지 않습니다.</div></div>
 </section>
 </div><p class="foot">시험용 현황판 · 실제 응답 수집은 Firebase 데이터베이스의 접근 규칙이 허용되어야 작동합니다. 학교 현장 정식 운영 전 개인정보·보안 검토가 필요합니다.</p>
@@ -143,17 +143,17 @@ body.detail-open{overflow:hidden}
     <section class="detail-content" id="detailMood" aria-label="감정 지도 확대" hidden>
       <div class="detail-mood-layout">
         <div class="large-map" id="largeMoodMap" aria-label="전체 참여자 익명 감정 분포 지도">
-          <div class="q red" data-large-area="highUncomfortable"><b>빨강 영역</b><small data-count>0명</small><div class="dots"></div></div>
-          <div class="q yellow" data-large-area="highComfortable"><b>노랑 영역</b><small data-count>0명</small><div class="dots"></div></div>
-          <div class="q blue" data-large-area="lowUncomfortable"><b>파랑 영역</b><small data-count>0명</small><div class="dots"></div></div>
-          <div class="q green" data-large-area="lowComfortable"><b>초록 영역</b><small data-count>0명</small><div class="dots"></div></div>
+          <div class="q red" data-large-area="highUncomfortable"><b>불편함<br>에너지 높음</b><small data-count>0명</small><div class="dots"></div></div>
+          <div class="q yellow" data-large-area="highComfortable"><b>편안함<br>에너지 높음</b><small data-count>0명</small><div class="dots"></div></div>
+          <div class="q blue" data-large-area="lowUncomfortable"><b>불편함<br>에너지 낮음</b><small data-count>0명</small><div class="dots"></div></div>
+          <div class="q green" data-large-area="lowComfortable"><b>편안함<br>에너지 낮음</b><small data-count>0명</small><div class="dots"></div></div>
         </div>
         <div class="mood-side">
           <div class="mood-total"><small>감정 위치를 선택한 인원</small><strong id="bigMoodCount">0명</strong></div>
-          <div class="mood-area-stat"><span class="sw" style="background:#e9a19b"></span><span>빨강 · 불편함 / 에너지 높음</span><strong id="bigRed">0</strong></div>
-          <div class="mood-area-stat"><span class="sw" style="background:#e6c04d"></span><span>노랑 · 편안함 / 에너지 높음</span><strong id="bigYellow">0</strong></div>
-          <div class="mood-area-stat"><span class="sw" style="background:#84b1eb"></span><span>파랑 · 불편함 / 에너지 낮음</span><strong id="bigBlue">0</strong></div>
-          <div class="mood-area-stat"><span class="sw" style="background:#82c79a"></span><span>초록 · 편안함 / 에너지 낮음</span><strong id="bigGreen">0</strong></div>
+          <div class="mood-area-stat"><span class="sw" style="background:#e9a19b"></span><span>불편함 · 에너지 높음</span><strong id="bigRed">0</strong></div>
+          <div class="mood-area-stat"><span class="sw" style="background:#e6c04d"></span><span>편안함 · 에너지 높음</span><strong id="bigYellow">0</strong></div>
+          <div class="mood-area-stat"><span class="sw" style="background:#84b1eb"></span><span>불편함 · 에너지 낮음</span><strong id="bigBlue">0</strong></div>
+          <div class="mood-area-stat"><span class="sw" style="background:#82c79a"></span><span>편안함 · 에너지 낮음</span><strong id="bigGreen">0</strong></div>
           <p class="mood-note">점 하나가 하나의 감정 선택 결과입니다. 점에는 이름을 표시하지 않으며, 선택을 강요하지 않습니다.</p>
         </div>
       </div>
