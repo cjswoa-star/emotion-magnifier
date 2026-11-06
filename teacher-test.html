@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>감정확대경 · 교사 현황판 [시험용]</title>
+<style>
+:root{--ink:#1d2944;--muted:#6f7890;--line:#e5e8f1;--purple:#6957e9;--soft:#f5f5fc;--blue:#e9f1ff;--pink:#f7eafb}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 0% 0%,#ece9ff,transparent 40%),#f7f8fd;color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif}
+button,input{font:inherit}button{cursor:pointer}.wrap{max-width:1200px;margin:auto;padding:32px 25px 80px}
+header{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:22px}.brand{display:flex;gap:12px;align-items:center}.logo{height:54px;width:54px;background:linear-gradient(145deg,#8c7bfc,#5d51d9);border-radius:19px;color:white;display:grid;place-items:center;font-size:27px;box-shadow:0 8px 18px #6c5cdd33}
+h1{font-size:25px;letter-spacing:-1.2px;margin:0}h2{letter-spacing:-.5px}.sub{color:var(--muted);font-size:13px;margin:4px 0 0}.pill{border:1px solid #dadcf6;border-radius:99px;padding:9px 14px;background:#fff;color:#6656c5;font-size:12px;font-weight:700}
+.session{display:grid;grid-template-columns:minmax(0,1fr) 174px;gap:20px;border:1px solid #e2dfff;background:linear-gradient(110deg,#fff,#eeebff);border-radius:29px;padding:27px 30px;box-shadow:0 12px 30px #4b46720d}
+.eyebrow{color:#7867d7;font-weight:800;letter-spacing:.08em;font-size:12px}.code{font-size:clamp(38px,5vw,64px);font-weight:850;letter-spacing:.13em;line-height:1.15;margin:10px 0 8px;font-variant-numeric:tabular-nums}.helper{font-size:13px;color:#626b85;line-height:1.65}
+.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}.btn{border:0;border-radius:12px;background:var(--purple);color:#fff;font-weight:750;padding:12px 18px;box-shadow:0 4px 0 #5546ba22}.btn:disabled{opacity:.5;cursor:default}.btn.alt{background:#fff;color:#564bc4;border:1px solid #dcd8f5;box-shadow:none}.qrbox{background:#fff;border:1px solid #e8e8ef;border-radius:20px;padding:12px;min-height:174px;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;gap:8px}.qrbox img{height:133px;width:133px;object-fit:contain}.qrbox small{color:#707a90;font-size:10px}.qrplaceholder{color:#817ea1;font-size:12px;line-height:1.6}
+.url{margin-top:12px;word-break:break-all;color:#5f57b2;font-size:12px;text-decoration:underline}
+.sectionhead{display:flex;justify-content:space-between;align-items:end;gap:10px;margin:32px 0 16px}.sectionhead h2{font-size:22px;margin:0}.sectionhead p{margin:3px 0 0;color:var(--muted);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:19px}.panel{aspect-ratio:1 / 1;min-height:490px;display:flex;flex-direction:column;padding:29px;border:1px solid #e7e8f3;border-radius:32px;background:#fff;box-shadow:0 12px 26px #3333550b;overflow:hidden}.panel.quiz{background:linear-gradient(150deg,#fff,#f5f2ff)}.panel.mood{background:linear-gradient(160deg,#fff,#f4faff)}
+.paneltop{display:flex;justify-content:space-between;gap:10px;align-items:center}.paneltag{border-radius:99px;background:#ece9ff;color:#6654c9;padding:7px 11px;font-size:12px;font-weight:800}.mood .paneltag{background:#e5f3ed;color:#357864}
+.panel h3{font-size:24px;margin:17px 0 6px}.hint{color:#768097;font-size:13px;margin:0}.kpirow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:25px 0 15px}.kpi{background:#fff;border:1px solid #e6e6f1;border-radius:20px;padding:15px}.kpi span{color:#778098;font-size:12px}.kpi b{font-size:28px;display:block;line-height:1.35;margin-top:7px;font-variant-numeric:tabular-nums}.barlabel{display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px}.track{height:12px;background:#e6e4f1;border-radius:15px;overflow:hidden}.fill{height:100%;background:#7c6df0;border-radius:15px;width:0%;transition:width .3s}
+.bottom{margin-top:auto;padding-top:19px}.status{border-radius:18px;padding:13px 15px;background:#ffffffb8;border:1px solid #e7e7f2;font-size:13px;color:#5d6680;line-height:1.7}
+.moodmap{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;width:100%;max-width:305px;aspect-ratio:1;margin:20px auto 0;border:5px solid white;border-radius:22px;overflow:hidden;box-shadow:0 6px 20px #34516c18}.q{position:relative;display:flex;flex-direction:column;justify-content:space-between;padding:11px}.q b{font-size:13px}.q small{font-size:12px;opacity:.73}.red{background:#ffd4d2}.yellow{background:#ffebad}.blue{background:#d4e6ff}.green{background:#d8f0d7}.dots{position:absolute;inset:0}.dot{width:8px;height:8px;border-radius:100%;position:absolute;background:#24314bc8;border:1.4px solid white;transform:translate(-50%,-50%)}
+.moodfigures{display:flex;justify-content:center;gap:15px;flex-wrap:wrap;font-size:12px;margin-top:12px}.moodfigures span{display:inline-flex;align-items:center;gap:6px}.swatch{width:9px;height:9px;border-radius:50%;display:inline-block}
+.foot{font-size:12px;color:#7a8294;margin:18px 2px}.notice{font-size:12px;border-radius:12px;margin-top:13px;padding:10px 14px;background:#f3effd;color:#6356a7}.hidden{display:none!important}
+@media(max-width:830px){.wrap{padding:17px 12px 45px}.grid{grid-template-columns:1fr}.panel{min-height:510px;aspect-ratio:auto}.session{grid-template-columns:1fr}.qrbox{max-width:220px}.sectionhead{margin-top:26px}header{align-items:start}h1{font-size:22px}.pill{font-size:11px}.panel{padding:23px}}
+</style></head><body>
+<div class="wrap">
+<header><div class="brand"><div class="logo">◌</div><div><h1>감정확대경 · 교사 현황판</h1><p class="sub">서로 다른 마음을 함께 발견하는 시간</p></div></div><span class="pill" id="connection">시범 화면</span></header>
+<section class="session" aria-label="참여 방법"><div>
+<div class="eyebrow">WORKSHOP · 참여코드</div><div class="code" id="sessionCode">—— ——</div>
+<div class="helper">학생은 참여코드 또는 QR로 입장합니다.<br>닉네임을 사용하며, 감정 지도 결과는 전체 통계로만 표시합니다.</div>
+<div class="actions"><button class="btn" id="createBtn">새 참여방 만들기</button><button class="btn alt" id="demoBtn">화면 예시 보기</button><button class="btn alt" id="copyBtn" disabled>참여 주소 복사</button></div>
+<a id="joinLink" class="url hidden" target="_blank" rel="noopener"></a><div class="notice" id="message">현재 기존 감정확대경 V3는 변경하지 않았습니다. 시험용 참여방을 만들 수 있습니다.</div>
+</div><div class="qrbox"><img class="hidden" id="qrImage" alt="참여용 QR 코드"><div id="qrPlaceholder" class="qrplaceholder">새 참여방을 만들면<br>QR 코드가 나타납니다.</div><small id="qrCaption">참여 주소 · 시험용</small></div></section>
+<div class="sectionhead"><div><h2>오늘의 활동 현황</h2><p>퀴즈의 이해도와 감정 지도의 분포를 한눈에 확인합니다.</p></div><span class="pill" id="total">참여 0명</span></div>
+<div class="grid">
+<section class="panel quiz" aria-label="감정 퀴즈 현황">
+<div class="paneltop"><div class="paneltag">QUIZ</div><span class="sub">감정어의 뜻 이해하기</span></div><h3>감정 퀴즈 현황</h3><p class="hint">응답 수와 정답률을 실시간으로 확인</p>
+<div class="kpirow"><div class="kpi"><span>퀴즈 완료</span><b id="quizDone">0명</b></div><div class="kpi"><span>평균 정답률</span><b id="quizRate">—</b></div></div>
+<div class="barlabel"><strong>퀴즈 완료율</strong><span id="quizProgressLabel">0 / 0명</span></div><div class="track"><div class="fill" id="quizProgress"></div></div>
+<div class="bottom"><div class="status" id="quizDetail">참여자가 퀴즈를 풀면 완료 인원과 문항별 응답이 집계됩니다.</div></div>
+</section>
+<section class="panel mood" aria-label="감정 지도 현황">
+<div class="paneltop"><div class="paneltag">MOOD MAP</div><span class="sub">내 마음의 위치 찾아보기</span></div><h3>감정 지도 현황</h3><p class="hint">선택한 위치를 익명 점으로 함께 보기</p>
+<div class="moodmap" id="moodMap"><div class="q red" data-area="highUncomfortable"><b>빨강</b><small id="redN">0명</small><div class="dots"></div></div><div class="q yellow" data-area="highComfortable"><b>노랑</b><small id="yellowN">0명</small><div class="dots"></div></div><div class="q blue" data-area="lowUncomfortable"><b>파랑</b><small id="blueN">0명</small><div class="dots"></div></div><div class="q green" data-area="lowComfortable"><b>초록</b><small id="greenN">0명</small><div class="dots"></div></div></div>
+<div class="bottom"><div class="status" id="moodDetail">감정 위치 선택 0명 · 참여자의 이름과 감정 위치를 연결해 공개하지 않습니다.</div></div>
+</section>
+</div><p class="foot">시험용 현황판 · 실제 응답 수집은 Firebase 데이터베이스의 접근 규칙이 허용되어야 작동합니다. 학교 현장 정식 운영 전 개인정보·보안 검토가 필요합니다.</p>
+</div>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+import {getDatabase,ref,get,runTransaction,onValue} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-database.js";
+const config={apiKey:"AIzaSyB6mWBT6IYc9BkGBPvPhIb0HBDA0Vj3Bxo",authDomain:"emotion-share-test.firebaseapp.com",databaseURL:"https://emotion-share-test-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"emotion-share-test",storageBucket:"emotion-share-test.firebasestorage.app",messagingSenderId:"9314731156",appId:"1:9314731156:web:528c2ff5274f3c4cbee081"};
+const $=id=>document.getElementById(id),base=location.pathname.replace(/[^/]*$/,""),joinBase=location.origin+base+"join-test.html",root="emotionMagnifierTest/sessions/";
+let db,stop=null,currentCode="",demo=false,items=[];try{db=getDatabase(initializeApp(config));$("connection").textContent="Firebase 연결 준비";}catch(e){$("connection").textContent="연결 설정 오류"}
+const esc=s=>String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const rand=()=>String(100000+(crypto.getRandomValues(new Uint32Array(1))[0]%900000));
+function say(s){$("message").textContent=s}
+function qr(code){const url=joinBase+"?code="+encodeURIComponent(code);$("joinLink").href=url;$("joinLink").textContent=url;$("joinLink").classList.remove("hidden");$("copyBtn").disabled=false;
+$("qrImage").src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=2&data="+encodeURIComponent(url);$("qrImage").classList.remove("hidden");$("qrPlaceholder").classList.add("hidden");}
+function showRoom(code){currentCode=code;demo=false;$("sessionCode").textContent=code;$("connection").textContent="실시간 접속";qr(code);history.replaceState(null,"","?code="+encodeURIComponent(code));
+if(stop)stop();stop=onValue(ref(db,root+code),snapshot=>{const data=snapshot.val();if(!data){say("참여방을 찾을 수 없습니다.");return}items=Object.values(data.participants||{});draw(items);},e=>{say("실시간 조회 실패: "+e.message);$("connection").textContent="실시간 연결 실패";});say("참여방을 만들었습니다. QR 또는 참여 주소를 전달하세요.");}
+$("createBtn").addEventListener("click",async()=>{if(!db)return say("Firebase에 연결할 수 없습니다.");$("createBtn").disabled=true;say("새 참여방 생성 확인 중…");try{let created;for(let i=0;i<8;i++){const code=rand();const r=await runTransaction(ref(db,root+code),v=>v===null?{meta:{createdAt:Date.now(),status:"open"},participants:{}}:undefined,{applyLocally:false});if(r.committed){created=code;break}}if(!created)throw Error("참여코드 생성 실패");showRoom(created);}catch(e){say("참여방 생성 실패: "+e.message);$("connection").textContent="연결 확인 필요";}finally{$("createBtn").disabled=false}});
+$("copyBtn").addEventListener("click",()=>navigator.clipboard.writeText($("joinLink").href).then(()=>say("참여 주소를 복사했습니다.")).catch(()=>say("주소 복사가 차단되었습니다. 주소를 직접 복사해 주세요.")));
+const fakeAreas=["highUncomfortable","highComfortable","lowUncomfortable","lowComfortable"];
+$("demoBtn").addEventListener("click",()=>{if(stop){stop();stop=null}demo=true;currentCode="";history.replaceState(null,"",location.pathname+"?demo=1");$("sessionCode").textContent="482731";$("connection").textContent="예시 데이터";$("qrImage").classList.add("hidden");$("qrPlaceholder").classList.remove("hidden");$("joinLink").classList.add("hidden");$("copyBtn").disabled=true;say("화면 디자인 확인용 예시입니다. QR 및 숫자 코드는 실제 입장에 사용되지 않습니다.");const test=Array.from({length:24},(_,i)=>({nickname:"참여자"+(i+1),mood:i<20?{area:fakeAreas[i%4],x:Math.min(.98,(i%4%2?.5:0)+.08+(i*13%36)/100),y:Math.min(.98,(i%4<2?0:.5)+.09+(i*7%35)/100),word:"감정"}:null,quizAreas:i<17?{highComfortable:{score:(5+i%6)*10,answeredCount:10,completedAt:Date.now(),answers:{}}}:null}));draw(test)});
+function draw(list){$("total").textContent="참여 "+list.length+"명";const done=list.filter(p=>Object.values(p.quizAreas||{}).some(q=>q.completedAt));const scores=done.flatMap(p=>Object.values(p.quizAreas||{}).filter(q=>q.completedAt).map(q=>q.score||0));const average=scores.length?Math.round(scores.reduce((a,b)=>a+b,0)/scores.length):null;
+$("quizDone").textContent=done.length+"명";$("quizRate").textContent=average===null?"—":average+"%";$("quizProgressLabel").textContent=done.length+" / "+list.length+"명";$("quizProgress").style.width=(list.length?100*done.length/list.length:0)+"%";
+const active=list.filter(p=>Object.values(p.quizAreas||{}).some(q=>q.answeredCount>0)&&!Object.values(p.quizAreas||{}).some(q=>q.completedAt)).length;
+const answers=list.flatMap(p=>Object.values(p.quizAreas||{}).flatMap(q=>Object.values(q.answers||{})));const right=answers.filter(a=>a.correct).length;
+$("quizDetail").textContent="진행 중 "+active+"명 · 누적 문항 응답 "+answers.length+"개"+(answers.length?" · 정답 "+right+"개 ("+Math.round(right*100/answers.length)+"%)":"")+(demo?" · 예시 데이터":"");
+for(const name of ["red","yellow","blue","green"]){$(name+"N").textContent="0명"}
+const areas={highUncomfortable:["redN","highUncomfortable"],highComfortable:["yellowN","highComfortable"],lowUncomfortable:["blueN","lowUncomfortable"],lowComfortable:["greenN","lowComfortable"]};
+for(const section of document.querySelectorAll(".dots"))section.replaceChildren();
+const moods=list.map(p=>p.mood).filter(m=>m&&m.area&&typeof m.x==="number"&&typeof m.y==="number");
+for(const [area,[label]] of Object.entries(areas)){const mm=moods.filter(x=>x.area===area);$(label).textContent=mm.length+"명";const dots=document.querySelector('[data-area="'+area+'"] .dots');const offsetX=area==="highComfortable"||area==="lowComfortable"?.5:0,offsetY=area==="lowUncomfortable"||area==="lowComfortable"?.5:0;for(const m of mm){const d=document.createElement("span");d.className="dot";d.style.left=(Math.min(98,Math.max(2,(m.x-offsetX)*200)))+"%";d.style.top=(Math.min(98,Math.max(2,(m.y-offsetY)*200)))+"%";dots.append(d)}}
+$("moodDetail").textContent="감정 위치 선택 "+moods.length+"명 / 전체 "+list.length+"명 · 점은 익명으로 표시됩니다."+(demo?" (예시)":"");
+}
+const urlCode=new URLSearchParams(location.search).get("code");if(urlCode&&/^\d{6}$/.test(urlCode)&&db)showRoom(urlCode);else if(new URLSearchParams(location.search).has("demo"))$("demoBtn").click();else draw([]);
+</script>
+</body></html>
